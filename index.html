@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Invoice Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+       <style>
+        @media screen {
+            
+        }
+        /* .input-group-text{
+            width: 80px;
+        } */
+            @media print
+            {
+                .btn{
+                    display: none;
+                }
+                .NoPrint
+                {
+                    display: none;
+                }
+                .form-control
+                {
+                    border: 0px;
+                }
+                .input-group-text
+                {
+                    border: 0px;
+                    background-color: white;
+                }
+            }
+        </style>
+        <script>
+            function GetPrint()
+            {
+                window.print();
+            }
+            function BtnAdd()
+            {
+                var v = $("#TRow").clone().appendTo("TBody");
+                $(v).find("input").val('');
+                $(v).removeClass("d-none");
+                $(v).find("th").first().html($('tr').length - 2);
+            }
+            function BtnDel(v)
+            {
+                $(v).parent().parent().remove();
+                GetTotal();
+
+                $("#TBody").find("tr").each(
+                    function(index)
+                    {
+                        $(this).find("th").first().html(index);
+                    }
+                );
+            }
+            function Calc(v)
+            {
+                var index = $(v).parent().parent().index();
+                
+                var qty = document.getElementsByName("qty")[index].value;
+                var rate = document.getElementsByName("rate")[index].value;
+
+                var amt = qty * rate;
+                document.getElementsByName("amt")[index].value = amt;
+
+                GetTotal();
+            }
+            function GetTotal()
+            {
+                var sum=0;
+                var amts = document.getElementsByName("amt");
+
+                for (let index = 0; index < amts.length; index++)
+                {
+                    var amt = amts[index].value;
+                    sum = +(sum) + +(amt);
+                }
+                document.getElementById("FTotal").value = sum;
+
+                var gst = document.getElementById("FGST").value;
+                var net = +(sum) + +(gst);
+                document.getElementById("FNet").value = net;
+
+            }
+        </script>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4>INVOICE Generator By (Abhi Kolge)</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Customer : </span>
+                            <input type="text" class="form-control" placeholder="Customer" aria-label="Username"
+                                aria-describedby="basic-addon1">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Addresss : </span>
+                            <input type="text" class="form-control" placeholder="Address" aria-label="Username"
+                                aria-describedby="basic-addon1">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">City : </span>
+                            <input type="text" class="form-control" placeholder="City" aria-label="Username"
+                                aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Inv. No : </span>
+                            <input type="text" class="form-control" placeholder="Inv. No" aria-label="Username"
+                                aria-describedby="basic-addon1">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Inv. Date : </span>
+                            <input type="date" class="form-control" placeholder="Inv. Date" aria-label="Username"
+                                aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">Sr. No</th>
+                            <th scope="col">Particular</th>
+                            <th scope="col" class="text-end">Qty</th>
+                            <th scope="col" class="text-end">Rate</th>
+                            <th scope="col" class="text-end" value="0" disabled="">Amount</th>
+                            <th scope="col" class="NoPrint">
+                                <button type="button" class="btn btn-success" onclick="BtnAdd()">+</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="TBody">
+                        <tr id="TRow" class="d-none">
+                            <th scope="row">1</th>
+                            <td><input type="text" class="form-control"></td>
+                            <td><input type="number" class="form-control text-end" name="qty" onchange="Calc(this);"></td>
+                            <td><input type="number" class="form-control text-end" name="rate" onchange="Calc(this);"></td>
+                            <td><input type="number" class="form-control text-end" name="amt" value="0" disabled=""></td>
+                            <td class="NoPrint"><button type="button" class="btn btn-danger" onclick="BtnDel(this)">X</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-8">
+                        <button type="button" class="btn btn-primary" onclick="GetPrint()">Print</button>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Total : </span>
+                            <input type="number" class="form-control text-end" id="FTotal" name="FTotal" disabled>
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">GST : </span>
+                            <input type="number" class="form-control text-end" id="FGST" name="FGST" onchange="GetTotal()">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Net Amount : </span>
+                            <input type="number" class="form-control text-end" id="FNet" name="FNet" disabled="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
